@@ -57,6 +57,26 @@ class ProductTest < ActiveSupport::TestCase
                           price:        1,
                           image_url:    "fred.gif")
     assert product.invalid?
-    assert_equal ["has already been taken"], product.errors[:title]
+    assert_equal [Product::TITLE_UNIQUENESS_ERROR], product.errors[:title]
+  end
+
+  test "title has at least 10 characters" do
+    titleShortest = "a"
+    titleShort = "123456789"
+    titleLong = "1234567890"
+    product = Product.new(title:        titleShortest,
+                          description:  "yyy",
+                          price:        1,
+                          image_url:    "fred.gif")
+
+    assert product.invalid?
+    assert_equal ["is too short (minimum is 10 characters)"], product.errors[:title]
+
+    product.title = titleShort
+    assert product.invalid?
+    assert_equal ["is too short (minimum is 10 characters)"], product.errors[:title]
+
+    product.title = titleLong
+    assert product.valid?
   end
 end
